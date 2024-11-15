@@ -1,69 +1,39 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+// Import required modules
+const express = require('express');
+const mongoose = require('mongoose');
+const path = require('path');
 
-const bodyParser = require('body-parser');     // Parses JSON in body
-// // for mongDB
-// const Student = require("./models/student");
+// Import Patient and Physician models
+const Patient = require('./models/patient'); // Adjust path as necessary
+const Physician = require('./models/physician'); // Adjust path as necessary
 
-// var indexRouter = require('./routes/index');
-// var usersRouter = require('./routes/users');
+// Initialize the express app
+const app = express();
 
-// var studentsRouter = require('./routes/students');
-// var customersRouter = require('./routes/customers');
+// Import controller
+const patientController = require('./controller/PatientController');
 
-var app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-// This is to enable cross-origin access
-app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  // Pass to next layer of middleware
-  next();
-});
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(logger('dev'));
+// Middleware to parse JSON bodies
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
-// app.use('/students', studentsRouter);
-// app.use('/customers', customersRouter);
+// Connect to MongoDB (replace with your database URI)
+mongoose.connect('mongodb://localhost:27017/eceFinalProject', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected successfully'))
+.catch((err) => console.log('Error connecting to MongoDB:', err));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+// Use patientController for the '/patient' route
+app.use('/patient', patientController);
+
+// Basic route
+app.get('/', (req, res) => {
+    res.send('Welcome to the Healthcare API');
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+// Set up the server to listen on a port
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
-
-app.listen(3000);
-module.exports = app;

@@ -1,0 +1,27 @@
+var express = require('express');
+var router = express.Router();
+var Patient = require("../models/Patient");
+
+router.post("/register", function(req, res){
+    const patient = new Patient({
+       email: req.body.email, 
+       name:  req.body.name,
+       gender: req.body.gender,
+       dob: req.body.date,
+       address: req.body.address,
+       phone: req.body.phone,
+       emergencyContact: req.body.emergencyContact,
+       primaryDoctor: req.body.primaryDoctor
+    })
+
+    patient.save(function(err, nPatient){
+        if(err){
+            res.status(400).send(err);
+        }else{
+            let msgStr = `New patient with ID: (${req.body.email}) has been created`;
+            res.status(201).json({ message: msgStr });
+            console.log(msgStr);
+        }
+    })
+
+});
