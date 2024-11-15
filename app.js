@@ -6,14 +6,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 const bodyParser = require('body-parser');  
-// Import Patient and Physician models
-const Patient = require('./models/patient'); // Adjust path as necessary
-const Physician = require('./models/physician'); // Adjust path as necessary
-
-
 
 // Import controller
 const patientController = require('./routes/PatientController');
+const physicianController = require('./routes/PhysicianController');
 // Initialize the express app
 const app = express();
 // Middleware to parse JSON bodies
@@ -51,6 +47,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/patient', patientController);
+app.use('/physician', physicianController);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

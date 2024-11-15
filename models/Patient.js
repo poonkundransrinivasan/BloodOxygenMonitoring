@@ -3,6 +3,8 @@ const db = require("../db");
 
 const patientSchema = new db.Schema({
     email: { type: String, required: true, unique: true }, // Email address of the patient
+    passwordHash:   {type: String, required: true},
+    lastAccess:     { type: Date, default: Date.now },
     name: { type: String, required: true },               // Full name of the patient
     gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true }, // Gender of the patient
     dob: { type: Date, required: true },              // Age of the patient
