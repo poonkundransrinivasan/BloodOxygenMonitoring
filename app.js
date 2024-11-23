@@ -8,6 +8,7 @@ var logger = require('morgan');
 const bodyParser = require('body-parser');  
 
 // Import controller
+var indexRouter = require('./routes/IndexController');
 const patientController = require('./routes/PatientController');
 const physicianController = require('./routes/PhysicianController');
 // Initialize the express app
@@ -45,7 +46,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Set view engine
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs'); // Replace `ejs` with your view engine if different
 
+app.use('/', indexRouter);
 app.use('/patient', patientController);
 app.use('/physician', physicianController);
 

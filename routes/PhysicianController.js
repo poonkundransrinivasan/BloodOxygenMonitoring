@@ -1,16 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var Patient = require("../models/physician");
 
-const express = require('express');
 const bcrypt = require('bcryptjs');
-const { body, validationResult } = require('express-validator');
 
 // Import the Physician model
 const Physician = require('../models/physician');
-
-// Create a new router instance
-const router = express.Router();
 
 // Register Physician API route
 router.post('/register', function (req, res) {

@@ -1,30 +1,58 @@
 var express = require('express');
 var router = express.Router();
 var Patient = require("../models/patient");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const SECRET_KEY = "your_secret_key";
 
 router.post("/register", function(req, res){
-    const patient = new Patient({
-       email: req.body.email, 
-       name:  req.body.name,
-       gender: req.body.gender,
-       dob: req.body.date,
-       address: req.body.address,
-       phone: req.body.phone,
-       emergencyContact: req.body.emergencyContact,
-       primaryDoctor: req.body.primaryDoctor
-    })
+    try{
+        const { email, password, name, gender, dob, address, phone } = req.body;
 
-    patient.save(function(err, nPatient){
-        if(err){
-            res.status(400).send(err);
-        }else{
-            let msgStr = `New patient with ID: (${req.body.email}) has been created`;
-            res.status(201).json({ message: msgStr });
-            console.log(msgStr);
-        }
-    })
+        // Check if the email already exists
+        Patient.findOne({ email }, function (err, existingPatient) {
+            if (err) {
+                return res.status(500).send(err);
+            }
 
+            if (existingPatient) {
+                return res.status(400).json({ message: 'Email is already registered.' });
+            }
+
+            // Hash the password before saving
+            bcrypt.genSalt(10, function (err, salt) {
+                if (err) {
+                    return res.status(500).send(err);
+                }
+
+                bcrypt.hash(password, salt, function (err, passwordHash) {
+                    if (err) {
+                        return res.status(500).send(err);
+                    }
+
+                    const patient = new Patient({
+                        email, passwordHash, name, gender, dob, address, phone
+                    });
+
+                    patient.save(function (err, newPatient) {
+                        if (err) {
+                            return res.status(400).send(err);
+                        } else {
+                            const msgStr = `New Patient with ID: (${email}) has been registered.`;
+                            res.status(201).json({ message: msgStr });
+                            console.log(msgStr);
+                        }
+                    });
+                });
+            });
+        });
+    }catch(error){
+        res.status(500).json({
+            error: error
+        });
+    }
 });
+
 
 router.get("/getdetails", function(req, res) {
     const email = req.query.email;
@@ -41,6 +69,57 @@ router.get("/getdetails", function(req, res) {
         } else {
             res.status(200).json(patient);
         }
+    });
+});
+
+
+router.post("/login", function(req, res) {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ message: "Email and password are required." });
+    }
+
+    // Find the patient by email
+    Patient.findOne({ email }, function(err, patient) {
+        if (err) {
+            return res.status(500).json({ message: "Error while fetching patient data.", error: err });
+        }
+
+        if (!patient) {
+            return res.status(404).json({ message: "Email and password are required." });
+        }
+
+        // Compare the provided password with the hashed password
+        bcrypt.compare(password, patient.passwordHash, function(err, isMatch) {
+            if (err) {
+                return res.status(500).json({ message: "Error", error: err });
+            }
+
+            if (!isMatch) {
+                return res.status(401).json({ message: "Invalid email or password." });
+            }
+
+            // Generate a JWT token
+            const token = jwt.sign(
+                { id: patient._id, email: patient.email },
+                SECRET_KEY,
+                { expiresIn: "1h" }
+            );
+
+            return res.status(200).json({
+                message: "Login successful.",
+                token,
+                patient: {
+                    id: patient._id,
+                    name: patient.name,
+                    email: patient.email,
+                    gender: patient.gender,
+                    dob: patient.dob,
+                    phone: patient.phone
+                }
+            });
+        });
     });
 });
 
