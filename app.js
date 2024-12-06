@@ -10,7 +10,8 @@ const bodyParser = require('body-parser');
 // Import controller
 var indexRouter = require('./routes/IndexController');
 const patientController = require('./routes/PatientController');
-const physicianController = require('./routes/PhysicianController');
+const physicianRoutes = require('./routes/PhysicianController');
+
 // Initialize the express app
 const app = express();
 // Middleware to parse JSON bodies
@@ -52,7 +53,7 @@ app.set('view engine', 'ejs'); // Replace `ejs` with your view engine if differe
 
 app.use('/', indexRouter);
 app.use('/patient', patientController);
-app.use('/physician', physicianController);
+app.use('/physician', physicianRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
