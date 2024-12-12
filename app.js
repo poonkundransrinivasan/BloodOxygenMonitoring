@@ -4,7 +4,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+const cors = require('cors');
 const bodyParser = require('body-parser');  
 
 // Import controller
@@ -20,6 +20,14 @@ app.use(express.json());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+
+
+// Allow requests from your frontend origin
+app.use(cors({
+  origin: 'http://frontend.example.com', // Replace with your frontend URL
+  methods: ['GET', 'POST'], // Allowed methods
+  credentials: true // If cookies or auth headers are involved
+}));
 
 
 // This is to enable cross-origin access

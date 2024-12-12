@@ -70,7 +70,7 @@ router.post("/login", function(req, res) {
         }
 
         if (!physician) {
-            return res.status(404).json({ message: "Email and password are required." });
+            return res.status(404).json({ message: "Invalid email or password." });
         }
 
         // Compare the provided password with the hashed password
