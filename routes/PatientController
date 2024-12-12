@@ -1,3 +1,189 @@
+// var express = require('express');
+// var router = express.Router();
+// var Patient = require("../models/patient");
+// const bcrypt = require('bcryptjs');
+// const jwt = require('jsonwebtoken');
+// const SECRET_KEY = "your_secret_key";
+
+// router.post("/register", function(req, res){
+//     try{
+//         const { email, password, name, gender, dob, address, phone } = req.body;
+
+//         // Check if the email already exists
+//         Patient.findOne({ email }, function (err, existingPatient) {
+//             if (err) {
+//                 return res.status(500).send(err);
+//             }
+
+//             if (existingPatient) {
+//                 return res.status(400).json({ message: 'Email is already registered.' });
+//             }
+
+//             // Hash the password before saving
+//             bcrypt.genSalt(10, function (err, salt) {
+//                 if (err) {
+//                     return res.status(500).send(err);
+//                 }
+
+//                 bcrypt.hash(password, salt, function (err, passwordHash) {
+//                     if (err) {
+//                         return res.status(500).send(err);
+//                     }
+
+//                     const patient = new Patient({
+//                         email, passwordHash, name, gender, dob, address, phone
+//                     });
+
+//                     patient.save(function (err, newPatient) {
+//                         if (err) {
+//                             return res.status(400).send(err);
+//                         } else {
+//                             const msgStr = `New Patient with ID: (${email}) has been registered.`;
+//                             res.status(201).json({ message: msgStr });
+//                             console.log(msgStr);
+//                         }
+//                     });
+//                 });
+//             });
+//         });
+//     }catch(error){
+//         res.status(500).json({
+//             error: error
+//         });
+//     }
+// });
+
+
+// router.get("/getdetails", function(req, res) {
+//     const email = req.query.email;
+//     console.log('Received email query parameter:', email); // Debug log
+  
+//     if (!email) {
+//       return res.status(400).send({ message: "Email query parameter is required" });
+//     }
+  
+//     Patient.findOne({ email: email }, function(err, patient) {
+//       if (err) {
+//         console.error('Error fetching patient details:', err); // Debug log
+//         res.status(500).send({ message: "Error fetching patient details", error: err });
+//       } else if (!patient) {
+//         res.status(404).send({ message: "Patient not found" });
+//       } else {
+//         res.status(200).json(patient);
+//       }
+//     });
+//   });
+
+
+// router.post("/login", function(req, res) {
+//     const { email, password } = req.body;
+
+//     if (!email || !password) {
+//         return res.status(400).json({ message: "Email and password are required." });
+//     }
+
+//     // Find the patient by email
+//     Patient.findOne({ email }, function(err, patient) {
+//         if (err) {
+//             return res.status(500).json({ message: "Error while fetching patient data.", error: err });
+//         }
+
+//         if (!patient) {
+//             return res.status(404).json({ message: "Email and password are required." });
+//         }
+
+//         // Compare the provided password with the hashed password
+//         bcrypt.compare(password, patient.passwordHash, function(err, isMatch) {
+//             if (err) {
+//                 return res.status(500).json({ message: "Error", error: err });
+//             }
+
+//             if (!isMatch) {
+//                 return res.status(401).json({ message: "Invalid email or password." });
+//             }
+
+//             // Generate a JWT token
+//             const token = jwt.sign(
+//                 { id: patient._id, email: patient.email },
+//                 SECRET_KEY,
+//                 { expiresIn: "1h" }
+//             );
+
+//             return res.status(200).json({
+//                 message: "Login successful.",
+//                 token,
+//                 patient: {
+//                     id: patient._id,
+//                     name: patient.name,
+//                     email: patient.email,
+//                     gender: patient.gender,
+//                     dob: patient.dob,
+//                     phone: patient.phone
+//                 }
+//             });
+//         });
+//     });
+// });
+
+// router.get("/test", function(req, res){
+//     res.send('Welcome to the Healthcare API: Patient');
+// });
+
+// router.put('/update', async (req, res) => {
+//     const { email, firstName, lastName, address } = req.body;
+
+//     try {
+//         const updatedPatient = await Patient.findOneAndUpdate(
+//             { email }, // Search by email (non-editable field)
+//             { $set: { name: `${firstName} ${lastName}`, address } }, // Update editable fields
+//             { new: true }
+//         );
+
+//         if (!updatedPatient) {
+//             return res.status(404).json({ message: 'Patient not found.' });
+//         }
+
+//         res.status(200).json({ message: 'Patient details updated successfully.', patient: updatedPatient });
+//     } catch (error) {
+//         console.error('Error updating patient details:', error);
+//         res.status(500).json({ message: 'Internal server error.' });
+//     }
+// });
+
+// router.post('/reset-password', async (req, res) => {
+//     const { email, currentPassword, newPassword } = req.body;
+
+//     try {
+//         // Find the patient by email
+//         const patient = await Patient.findOne({ email });
+
+//         if (!patient) {
+//             return res.status(404).json({ message: 'Patient not found.' });
+//         }
+
+//         // Check if the current password matches
+//         const isMatch = await bcrypt.compare(currentPassword, patient.passwordHash);
+//         if (!isMatch) {
+//             return res.status(400).json({ message: 'Current password is incorrect.' });
+//         }
+
+//         // Hash the new password
+//         const salt = await bcrypt.genSalt(10);
+//         patient.passwordHash = await bcrypt.hash(newPassword, salt);
+
+//         // Save the updated password to the database
+//         await patient.save();
+
+//         res.status(200).json({ message: 'Password reset successfully!' });
+//     } catch (error) {
+//         console.error('Error resetting password:', error);
+//         res.status(500).json({ message: 'Internal server error.' });
+//     }
+// });
+
+// module.exports = router;
+
+
 var express = require('express');
 var router = express.Router();
 var Patient = require("../models/patient");
@@ -5,125 +191,155 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = "your_secret_key";
 
-router.post("/register", function(req, res){
-    try{
+router.post("/register", async (req, res) => {
+    try {
         const { email, password, name, gender, dob, address, phone } = req.body;
 
         // Check if the email already exists
-        Patient.findOne({ email }, function (err, existingPatient) {
-            if (err) {
-                return res.status(500).send(err);
-            }
+        const existingPatient = await Patient.findOne({ email });
+        if (existingPatient) {
+            return res.status(400).json({ message: 'Email is already registered.' });
+        }
 
-            if (existingPatient) {
-                return res.status(400).json({ message: 'Email is already registered.' });
-            }
+        // Hash the password before saving
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
 
-            // Hash the password before saving
-            bcrypt.genSalt(10, function (err, salt) {
-                if (err) {
-                    return res.status(500).send(err);
-                }
-
-                bcrypt.hash(password, salt, function (err, passwordHash) {
-                    if (err) {
-                        return res.status(500).send(err);
-                    }
-
-                    const patient = new Patient({
-                        email, passwordHash, name, gender, dob, address, phone
-                    });
-
-                    patient.save(function (err, newPatient) {
-                        if (err) {
-                            return res.status(400).send(err);
-                        } else {
-                            const msgStr = `New Patient with ID: (${email}) has been registered.`;
-                            res.status(201).json({ message: msgStr });
-                            console.log(msgStr);
-                        }
-                    });
-                });
-            });
+        const patient = new Patient({
+            email,
+            passwordHash,
+            name,
+            gender,
+            dob,
+            address,
+            phone
         });
-    }catch(error){
-        res.status(500).json({
-            error: error
-        });
+
+        await patient.save();
+
+        const msgStr = `New Patient with ID: (${email}) has been registered.`;
+        res.status(201).json({ message: msgStr });
+        console.log(msgStr);
+    } catch (error) {
+        console.error('Error during patient registration:', error);
+        res.status(500).json({ message: 'Internal server error.', error });
     }
 });
 
-
-router.get("/getdetails", function(req, res) {
+router.get("/getdetails", async (req, res) => {
     const email = req.query.email;
+    console.log('Received email query parameter:', email);
 
     if (!email) {
         return res.status(400).send({ message: "Email query parameter is required" });
     }
 
-    Patient.findOne({ email: email }, function(err, patient) {
-        if (err) {
-            res.status(400).send({ message: "Error fetching patient details", error: err });
-        } else if (!patient) {
-            res.status(404).send({ message: "Patient not found" });
-        } else {
-            res.status(200).json(patient);
+    try {
+        const patient = await Patient.findOne({ email });
+        if (!patient) {
+            return res.status(404).json({ message: "Patient not found." });
         }
-    });
+        res.status(200).json(patient);
+    } catch (error) {
+        console.error('Error fetching patient details:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
 });
 
-
-router.post("/login", function(req, res) {
+router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required." });
     }
 
-    // Find the patient by email
-    Patient.findOne({ email }, function(err, patient) {
-        if (err) {
-            return res.status(500).json({ message: "Error while fetching patient data.", error: err });
-        }
-
+    try {
+        const patient = await Patient.findOne({ email });
         if (!patient) {
-            return res.status(404).json({ message: "Invalid email or password." });
+            return res.status(404).json({ message: "Email and password are required." });
         }
 
-        // Compare the provided password with the hashed password
-        bcrypt.compare(password, patient.passwordHash, function(err, isMatch) {
-            if (err) {
-                return res.status(500).json({ message: "Error", error: err });
+        const isMatch = await bcrypt.compare(password, patient.passwordHash);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid password." });
+        }
+
+        const token = jwt.sign(
+            { id: patient._id, email: patient.email, role: 'Patient' },
+            SECRET_KEY,
+            { expiresIn: "1h" }
+        );
+
+        res.status(200).json({
+            message: "Login successful.",
+            token,
+            patient: {
+                id: patient._id,
+                name: patient.name,
+                email: patient.email,
+                gender: patient.gender,
+                dob: patient.dob,
+                phone: patient.phone
             }
-
-            if (!isMatch) {
-                return res.status(401).json({ message: "Invalid email or password." });
-            }
-
-            // Generate a JWT token
-            const token = jwt.sign(
-                { id: patient._id, email: patient.email },
-                SECRET_KEY,
-                { expiresIn: "1h" }
-            );
-
-            return res.status(200).json({
-                message: "Login successful.",
-                token,
-                patient: {
-                    id: patient._id,
-                    name: patient.name,
-                    email: patient.email,
-                    gender: patient.gender,
-                    dob: patient.dob,
-                    phone: patient.phone
-                }
-            });
         });
-    });
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
 });
 
-router.get("/test", function(req, res){
+router.put('/update', async (req, res) => {
+    const { email, firstName, lastName, address } = req.body;
+
+    try {
+        const updatedPatient = await Patient.findOneAndUpdate(
+            { email },
+            { $set: { name: `${firstName} ${lastName}`, address } },
+            { new: true }
+        );
+
+        if (!updatedPatient) {
+            return res.status(404).json({ message: 'Patient not found.' });
+        }
+
+        res.status(200).json({
+            message: 'Patient details updated successfully.',
+            patient: updatedPatient
+        });
+    } catch (error) {
+        console.error('Error updating patient details:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+router.post('/reset-password', async (req, res) => {
+    const { email, currentPassword, newPassword } = req.body;
+
+    try {
+        const patient = await Patient.findOne({ email });
+
+        if (!patient) {
+            return res.status(404).json({ message: 'Patient not found.' });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, patient.passwordHash);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Current password is incorrect.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        patient.passwordHash = await bcrypt.hash(newPassword, salt);
+
+        await patient.save();
+
+        res.status(200).json({ message: 'Password reset successfully!' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({ message: 'Internal server error.' });
+    }
+});
+
+router.get("/test", (req, res) => {
     res.send('Welcome to the Healthcare API: Patient');
 });
 
