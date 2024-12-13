@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var Physician = require("../models/physician");
+var Physician = require("../models/Physician");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = "your_secret_key";
