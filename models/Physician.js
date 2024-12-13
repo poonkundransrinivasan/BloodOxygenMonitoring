@@ -13,4 +13,5 @@ const physicianSchema = new db.Schema({
     ]
 });
 
+
 module.exports = db.model('Physician', physicianSchema);
