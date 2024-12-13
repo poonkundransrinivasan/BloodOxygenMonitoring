@@ -5,6 +5,28 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = "your_secret_key";
 
+
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    
+    // Extract token after "Bearer "
+    const token = authHeader && authHeader.split(' ')[1]; 
+
+    if (!token) {
+        return res.status(401).json({ error: 'Access denied. No token provided.' });
+    }
+
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+        if (err) {
+            console.error('Token verification failed:', err); // Debug log
+            return res.status(403).json({ error: 'Invalid or expired token.' });
+        }
+        console.log('Verified user:', user); // Debug log
+        req.user = user;
+        next();
+    });
+}
+
 // Register a new physician
 router.post("/register", async (req, res) => {
     try {
@@ -42,7 +64,7 @@ router.post("/register", async (req, res) => {
 });
 
 // Get physician details
-router.get("/getdetails", async (req, res) => {
+router.get("/getdetails", authenticateToken,  async (req, res) => {
     const email = req.query.email;
   
     if (!email) {
@@ -106,7 +128,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Update physician details
-router.put('/update', async (req, res) => {
+router.put('/update', authenticateToken, async (req, res) => {
     const { email, firstName, lastName, specialization, qualifications } = req.body;
 
     try {
@@ -161,5 +183,10 @@ router.post('/reset-password', async (req, res) => {
 router.get("/test", (req, res) => {
     res.send('Welcome to the Healthcare API: Physician');
 });
+
+router.post('/reset-password', async (req, res) =>{
+    
+})
+
 
 module.exports = router;

@@ -14,6 +14,9 @@ const patientSchema = new db.Schema({
         zip: { type: String, required: true }            // ZIP/Postal code
     },
     phone: { type: String, required: true },             // Phone number
+    physicianId: {type: String, required: true},
+    deviceName: {type: String},
+    deviceSerialNumber: {type: String}
 });
 
 const Patient = db.models.Patient || db.model('Patient', patientSchema);
