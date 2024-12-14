@@ -9,13 +9,14 @@ const bodyParser = require('body-parser');
 
 // Import controller
 var indexRouter = require('./routes/IndexController');
-const patientController = require('./routes/PatientController');
+const patientController = require('./routes/PatientController.js');
 const physicianRoutes = require('./routes/PhysicianController');
 const particleController = require('./routes/ParticleController');
 
 // Initialize the express app
 const app = express();
 // Middleware to parse JSON bodies
+app.use(cors());
 app.use(express.json());
 
 // view engine setup
