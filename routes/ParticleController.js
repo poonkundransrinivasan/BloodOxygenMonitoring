@@ -7,11 +7,11 @@ const router = express.Router();
 // Create a new particle entry
 router.post('/particles', async (req, res) => {
     try {
-        const { deviceSerialNumber, dataType, datavalue } = req.body;
+        const { deviceSerialNumber, heart_rate, spo2, timestamp } = req.body;
 
         // Validate required fields
-        if (!deviceSerialNumber || !dataType || datavalue == null) {
-            return res.status(400).json({ error: 'Every field is required.' });
+        if (!deviceSerialNumber) {
+            return res.status(400).json({ error: 'Device Serial Number is required.' });
         }
 
         // Check if the device is registered to any patient
@@ -23,8 +23,9 @@ router.post('/particles', async (req, res) => {
         // Create a new particle document
         const newParticle = new Particle({
             deviceSerialNumber,
-            dataType,
-            datavalue
+            heart_rate: heart_rate || undefined,
+            spo2: spo2 || undefined,
+            timestamp: timestamp || Date.now()
         });
 
         // Save to the database
