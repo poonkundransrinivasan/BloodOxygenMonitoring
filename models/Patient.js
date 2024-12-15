@@ -14,7 +14,7 @@ const patientSchema = new db.Schema({
         zip: { type: String, required: true }            // ZIP/Postal code
     },
     phone: { type: String, required: true },             // Phone number
-    physicianId: {type: String, required: true},
+    physicianId: {type: String, default: null},
     deviceName: {type: String},
     deviceSerialNumber: {type: String}
 });

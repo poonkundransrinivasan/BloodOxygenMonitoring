@@ -198,7 +198,7 @@ function authenticateToken(req, res, next) {
     
     // Extract token after "Bearer "
     const token = authHeader && authHeader.split(' ')[1]; 
-
+    console.log(authHeader);
     if (!token) {
         return res.status(401).json({ error: 'Access denied. No token provided.' });
     }
