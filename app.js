@@ -19,24 +19,21 @@ const app = express();
 // Middleware to parse JSON bodies
 app.use(cors());
 app.use(express.json());
-app.use(cors({ origin: 'https://ec2-18-217-163-243.us-east-2.compute.amazonaws.com:3001',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed methods
-    credentials: true // If cookies or auth headers are involved
- }));
+
+// Update CORS to use HTTP instead of HTTPS
+app.use(cors({ 
+    origin: 'https://ec2-18-217-163-243.us-east-2.compute.amazonaws.com:3001',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
 
 // This is to enable cross-origin access
 app.use(function (req, res, next) {
-  // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  // Request methods you wish to allow
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-  // Set to true if you need the website to include cookies in the requests sent
-  // to the API (e.g. in case you use sessions)
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  // Pass to next layer of middleware
-  next();
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
 });
 
 app.use(bodyParser.json());
@@ -55,20 +52,23 @@ app.use('/particle', particleController);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+    next(createError(404));
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  const error = req.app.get('env') === 'development' ? err : {};
-  
-  // send error as JSON instead of rendering a view
-  res.status(err.status || 500);
-  res.json({
-    message: err.message,
-    error: error
-  });
+    const error = req.app.get('env') === 'development' ? err : {};
+    res.status(err.status || 500);
+    res.json({
+        message: err.message,
+        error: error
+    });
+});
+
+// Add this to start the server
+const port = 3000; // or whatever port you want to use
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
 });
 
 module.exports = app;
