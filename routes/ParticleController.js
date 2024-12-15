@@ -15,7 +15,7 @@ router.post('/particles', async (req, res) => {
         }
 
         // Check if the device is registered to any patient
-        const registeredPatient = await Patient.findOne({ deviceSerialNumber });
+        const registeredPatient = await Patient.findOne({ 'devices.serialNumber': deviceSerialNumber });
         if (!registeredPatient) {
             return res.status(400).json({ error: 'Device not registered to any patient.' });
         }
