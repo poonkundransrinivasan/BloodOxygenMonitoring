@@ -15,8 +15,12 @@ const patientSchema = new db.Schema({
     },
     phone: { type: String, required: true },             // Phone number
     physicianId: {type: String, default: null},
-    deviceName: {type: String},
-    deviceSerialNumber: {type: String}
+    devices: [
+        {
+            deviceName: { type: String, required: true },
+            deviceSerialNumber: { type: String, required: true }
+        }
+    ]
 });
 
 const Patient = db.models.Patient || db.model('Patient', patientSchema);

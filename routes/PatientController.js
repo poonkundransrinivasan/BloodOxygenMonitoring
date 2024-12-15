@@ -189,6 +189,7 @@ var router = express.Router();
 var Patient = require("../models/Patient");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+var Physician = require("../models/Physician");
 const SECRET_KEY = "your_secret_key";
 
 // Middleware to verify JWT token
@@ -198,7 +199,6 @@ function authenticateToken(req, res, next) {
     
     // Extract token after "Bearer "
     const token = authHeader && authHeader.split(' ')[1]; 
-    console.log(authHeader);
     if (!token) {
         return res.status(401).json({ error: 'Access denied. No token provided.' });
     }
@@ -383,16 +383,37 @@ router.post('/registerparticle', authenticateToken, async (req, res) => {
             return res.status(404).json({ error: 'Patient not found.' });
         }
 
-        // Update patient device information
-        patient.deviceName = deviceName;
-        patient.deviceSerialNumber = deviceSerialNumber;
+        // Check if device already exists
+        const existingDevice = patient.devices.find(
+            (device) => device.deviceSerialNumber === deviceSerialNumber
+        );
+
+        if (existingDevice) {
+            return res.status(400).json({ error: 'Device already registered.' });
+        }
+
+        // Add new device to the devices array
+        patient.devices.push({ deviceName, deviceSerialNumber });
         await patient.save();
 
-        res.status(200).json({ message: 'Device successfully registered to the patient.', patient });
+        res.status(200).json({
+            message: 'Device successfully registered to the patient.',
+            devices: patient.devices,
+        });
     } catch (error) {
         console.error('Error registering particle:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+router.get("/getallphysicians", authenticateToken, async (req, res) => {
+    try {
+        const physicians = await Physician.find({}); // Fetch all physicians
+        return res.status(200).json(physicians);
+      } catch (error) {
+        console.error(error);
+        return res.status(500).send('Internal Server Error');
+      }
 });
 
 
