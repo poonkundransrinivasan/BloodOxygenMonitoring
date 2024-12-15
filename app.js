@@ -19,6 +19,7 @@ const app = express();
 // Middleware to parse JSON bodies
 app.use(cors());
 app.use(express.json());
+app.use(cors({ origin: 'https://ec2-18-217-163-243.us-east-2.compute.amazonaws.com:3001' }));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -49,6 +50,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((err, req, res, next) => {
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({
+      success: false,
+      message: err.message || 'Internal Server Error',
+      error: process.env.NODE_ENV === 'development' ? err : {},
+  });
+});
+
 
 // // Set view engine
 // app.set('views', path.join(__dirname, 'views'));
