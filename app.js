@@ -19,6 +19,7 @@ const app = express();
 // Middleware to parse JSON bodies
 app.use(cors());
 app.use(express.json());
+app.use(cors({ origin: 'https://ec2-18-217-163-243.us-east-2.compute.amazonaws.com:3001' }));
 
 // This is to enable cross-origin access
 app.use(function (req, res, next) {
@@ -43,7 +44,24 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+<<<<<<< HEAD
 // Routes
+=======
+app.use((err, req, res, next) => {
+  const statusCode = err.status || 500;
+  res.status(statusCode).json({
+      success: false,
+      message: err.message || 'Internal Server Error',
+      error: process.env.NODE_ENV === 'development' ? err : {},
+  });
+});
+
+
+// // Set view engine
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'ejs'); // Replace `ejs` with your view engine if different
+
+>>>>>>> cd919b01809a196d8200c3240e029d160878bca6
 app.use('/', indexRouter);
 app.use('/patient', patientController);
 app.use('/physician', physicianRoutes);
