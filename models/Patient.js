@@ -1,6 +1,5 @@
 const db = require("../db");
 
-
 const patientSchema = new db.Schema({
     email: { type: String, required: true, unique: true }, // Email address of the patient
     passwordHash:   {type: String, required: true},
@@ -14,11 +13,11 @@ const patientSchema = new db.Schema({
         zip: { type: String, required: true }            // ZIP/Postal code
     },
     phone: { type: String, required: true },             // Phone number
-    physicianId: {type: String, default: null},
+    assignedPhysician: {type: Object, default: null},
     devices: [
         {
             deviceName: { type: String, required: true },
-            deviceSerialNumber: { type: String, required: true }
+            serialNumber: { type: String, required: true }
         }
     ]
 });

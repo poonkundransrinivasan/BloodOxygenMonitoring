@@ -314,12 +314,12 @@ router.post('/login', async (req, res) => {
 });
 
 router.put('/update', authenticateToken, async (req, res) => {
-    const { email, firstName, lastName, address } = req.body;
+    const { email, firstName, lastName, address, assignedPhysician } = req.body;
 
     try {
         const updatedPatient = await Patient.findOneAndUpdate(
             { email },
-            { $set: { name: `${firstName} ${lastName}`, address } },
+            { $set: { name: `${firstName} ${lastName}`, address, assignedPhysician} },
             { new: true }
         );
 
@@ -370,10 +370,11 @@ router.get("/test", (req, res) => {
 
 router.post('/registerparticle', authenticateToken, async (req, res) => {
     try {
-        const { email, deviceName, deviceSerialNumber } = req.body;
+        const { deviceName, serialNumber } = req.body;
+        email = req.user.email
 
         // Validate required fields
-        if (!email || !deviceName || !deviceSerialNumber) {
+        if (!deviceName || !serialNumber) {
             return res.status(400).json({ error: 'All fields are required.' });
         }
 
@@ -385,7 +386,7 @@ router.post('/registerparticle', authenticateToken, async (req, res) => {
 
         // Check if device already exists
         const existingDevice = patient.devices.find(
-            (device) => device.deviceSerialNumber === deviceSerialNumber
+            (device) => device.serialNumber === serialNumber
         );
 
         if (existingDevice) {
@@ -393,7 +394,7 @@ router.post('/registerparticle', authenticateToken, async (req, res) => {
         }
 
         // Add new device to the devices array
-        patient.devices.push({ deviceName, deviceSerialNumber });
+        patient.devices.push({ deviceName, serialNumber });
         await patient.save();
 
         res.status(200).json({
@@ -416,6 +417,69 @@ router.get("/getallphysicians", authenticateToken, async (req, res) => {
       }
 });
 
+router.delete('/deletedevice', authenticateToken, async (req, res) => {
+    try {
+        const { serialNumber } = req.body;
+        email = req.user.email
+        // Validate required fields
 
+        if (!serialNumber) {
+            return res.status(400).json({ error: 'Email and deviceSerialNumber are required.' });
+        }
+
+        // Find the patient by email
+        const patient = await Patient.findOne({ email });
+        if (!patient) {
+            return res.status(404).json({ error: 'Patient not found.' });
+        }
+
+        // Find the device index
+        const deviceIndex = patient.devices.findIndex(
+            (device) => device.serialNumber === serialNumber
+        );
+
+        // Check if the device exists
+        if (deviceIndex === -1) {
+            return res.status(404).json({ error: 'Device not found.' });
+        }
+
+        // Remove the device
+        patient.devices.splice(deviceIndex, 1);
+        await patient.save();
+
+        return res.status(200).json({
+            message: 'Device successfully deleted from the patient.',
+            devices: patient.devices,
+        });
+    } catch (error) {
+        console.error('Error deleting device:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+router.get('/getalldevices', authenticateToken, async (req, res) => {
+    try {
+        email = req.user.email
+        // Validate email
+        if (!email) {
+            return res.status(400).json({ error: 'Email is required.' });
+        }
+
+        // Find the patient by email
+        const patient = await Patient.findOne({ email });
+        if (!patient) {
+            return res.status(404).json({ error: 'Patient not found.' });
+        }
+
+        // Return the devices array
+        return res.status(200).json({
+            message: 'Devices retrieved successfully.',
+            devices: patient.devices,
+        });
+    } catch (error) {
+        console.error('Error retrieving devices:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 module.exports = router;
