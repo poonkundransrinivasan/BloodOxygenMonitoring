@@ -22,7 +22,7 @@ app.use(express.json());
 
 // Update CORS to use HTTP instead of HTTPS
 app.use(cors({ 
-    origin: 'https://ec2-18-217-163-243.us-east-2.compute.amazonaws.com:3001',
+    origin: 'http://ec2-3-15-232-246.us-east-2.compute.amazonaws.com:3001',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
