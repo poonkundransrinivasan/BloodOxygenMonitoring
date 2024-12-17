@@ -56,38 +56,38 @@ router.post('/particles', async (req, res) => {
     }
 });
 
-// router.get('/insertdummydata', async (req, res) => {
-//     try {
-//         const deviceSerialNumber = "556d8fqsdrfse000";
-//         const baseDate = new Date();
-//         baseDate.setHours(0, 0, 0, 0); // Start at midnight today
+router.get('/insertdummydata', async (req, res) => {
+    try {
+        const deviceSerialNumber = "556d8fqsdrfse000";
+        const baseDate = new Date();
+        baseDate.setHours(0, 0, 0, 0); // Start at midnight today
 
-//         const particles = [];
-//         for (let day = 0; day < 14; day++) {
-//             const currentDate = new Date(baseDate);
-//             currentDate.setDate(currentDate.getDate() - day);
+        const particles = [];
+        for (let day = 0; day < 14; day++) {
+            const currentDate = new Date(baseDate);
+            currentDate.setDate(currentDate.getDate() - day);
 
-//             for (let interval = 0; interval < 48; interval++) {
-//                 const timestamp = new Date(currentDate);
-//                 timestamp.setMinutes(interval * 30);
-//                 const heart_rate = (Math.random() * (100 - 60) + 60).toFixed(2); // Random HR between 60 and 100
-//                 const spo2 = (Math.random() * (99 - 90) + 90).toFixed(2); // Random SpO2 between 90 and 99
+            for (let interval = 0; interval < 48; interval++) {
+                const timestamp = new Date(currentDate);
+                timestamp.setMinutes(interval * 30);
+                const heart_rate = (Math.random() * (100 - 60) + 60).toFixed(2); // Random HR between 60 and 100
+                const spo2 = (Math.random() * (99 - 90) + 90).toFixed(2); // Random SpO2 between 90 and 99
 
-//                 particles.push({
-//                     deviceSerialNumber,
-//                     heart_rate: parseFloat(heart_rate),
-//                     spo2: parseFloat(spo2),
-//                     timestamp
-//                 });
-//             }
-//         }
+                particles.push({
+                    deviceSerialNumber,
+                    heart_rate: parseFloat(heart_rate),
+                    spo2: parseFloat(spo2),
+                    timestamp
+                });
+            }
+        }
 
-//         await Particle.insertMany(particles);
-//         res.status(201).json({ message: 'Dummy data inserted successfully', totalRecords: particles.length });
-//     } catch (error) {
-//         console.error('Error inserting dummy data:', error);
-//         res.status(500).json({ error: 'Internal Server Error' });
-//     }
-// });
+        await Particle.insertMany(particles);
+        res.status(201).json({ message: 'Dummy data inserted successfully', totalRecords: particles.length });
+    } catch (error) {
+        console.error('Error inserting dummy data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 module.exports = router;

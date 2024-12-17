@@ -3,6 +3,7 @@ var router = express.Router();
 var Patient = require("../models/Patient");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Particle = require('../models/Particle');
 var PatientService = require("../service/PatientService");
 var Physician = require("../models/Physician");
 const SECRET_KEY = "your_secret_key";
@@ -489,35 +490,35 @@ router.get('/getalldevices', authenticateToken, async (req, res) => {
     }
 });
 
-router.post('/getdevicereadings', authenticateToken, async (req, res) => {
-        /**
-     * POST /getdevicereadings
-     * Retrieves readings from a specific medical device based on its serial number.
-     *
-     * Header:
-     * - Authorization (string, required): Bearer token to authenticate the request.
-     *
-     * Body Parameters:
-     * - deviceSerialNumber (string, required): The serial number of the device whose readings are to be retrieved.
-     *
-     * Responses:
-     * - 200 OK: Successfully retrieved device readings.
-     * - 500 Internal Server Error: An error occurred on the server while processing the request, or the device serial number is undefined.
-     */
+// router.post('/getdevicereadings', authenticateToken, async (req, res) => {
+//         /**
+//      * POST /getdevicereadings
+//      * Retrieves readings from a specific medical device based on its serial number.
+//      *
+//      * Header:
+//      * - Authorization (string, required): Bearer token to authenticate the request.
+//      *
+//      * Body Parameters:
+//      * - deviceSerialNumber (string, required): The serial number of the device whose readings are to be retrieved.
+//      *
+//      * Responses:
+//      * - 200 OK: Successfully retrieved device readings.
+//      * - 500 Internal Server Error: An error occurred on the server while processing the request, or the device serial number is undefined.
+//      */
 
-    try {
-        const {deviceSerialNumber}  = req.body;
-        // Find patients assigned to the specified physician
-        if(!deviceSerialNumber){
-            return res.status(500).json({ error: 'Device ID Undefined' });
-        }
-        const readings = await Particle.find({ 'deviceSerialNumber': deviceSerialNumber.trim() });
-        return res.status(200).json(readings);
-    } catch (error) {
-        console.error('Error retrieving patients:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
+//     try {
+//         const {deviceSerialNumber}  = req.body;
+//         // Find patients assigned to the specified physician
+//         if(!deviceSerialNumber){
+//             return res.status(500).json({ error: 'Device ID Undefined' });
+//         }
+//         const readings = await Particle.find({ 'deviceSerialNumber': deviceSerialNumber.trim() });
+//         return res.status(200).json(readings);
+//     } catch (error) {
+//         console.error('Error retrieving patients:', error);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// });
 
 router.post('/patient-date-range-summary', async (req, res) => {
     /**
@@ -545,6 +546,7 @@ router.post('/patient-date-range-summary', async (req, res) => {
 
 try {
     const {email, startDate, endDate } = req.body;
+    console.log(req.body);
     if (!email || !startDate || !endDate) {
         return res.status(400).json({ error: 'Email, startDate, and endDate are required.' });
     }
@@ -586,7 +588,7 @@ router.post('/getdevicereadings', authenticateToken, async (req, res) => {
  * - 404 Not Found: Either no patient found with the given email or the device is not registered under the found patient.
  * - 500 Internal Server Error: An error occurred on the server while processing the request or a required parameter is undefined.
  */
-
+console.log(req.body);
 try {
     const { deviceSerialNumber, email } = req.body;
 
