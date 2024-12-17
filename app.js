@@ -3,9 +3,11 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
-const cors = require('cors');
+const cors = require('cors');  // only declare cors once
 var logger = require('morgan');
 const bodyParser = require('body-parser');
+const https = require('https');
+const fs = require('fs');
 
 // Import controller
 var indexRouter = require('./routes/IndexController');
@@ -16,26 +18,29 @@ const particleController = require('./routes/ParticleController');
 // Initialize the express app
 const app = express();
 
-// Middleware to parse JSON bodies
-app.use(cors());
-app.use(express.json());
+// SSL/HTTPS options
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/heartrackerpro.duckdns.org/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/heartrackerpro.duckdns.org/fullchain.pem')
+};
 
-// Update CORS to use HTTP instead of HTTPS
-app.use(cors({ 
-    origin: 'http://ec2-3-15-232-246.us-east-2.compute.amazonaws.com:3001',
+// CORS configuration
+app.use(cors({
+    origin: ['https://heartrackerpro.duckdns.org:3001', 'https://heartrackerpro.duckdns.org'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true
 }));
 
 // This is to enable cross-origin access
 app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Origin', 'https://heartrackerpro.duckdns.org:3001');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
 
+// Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logger('dev'));
@@ -65,10 +70,9 @@ app.use(function(err, req, res, next) {
     });
 });
 
-// Add this to start the server
-const port = 3000; // or whatever port you want to use
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+// Create HTTPS server
+https.createServer(options, app).listen(3000, () => {
+    console.log('HTTPS server running on port 3000');
 });
 
 module.exports = app;
