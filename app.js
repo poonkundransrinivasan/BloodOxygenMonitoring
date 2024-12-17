@@ -12,6 +12,12 @@ var indexRouter = require('./routes/IndexController');
 const patientController = require('./routes/PatientController.js');
 const physicianRoutes = require('./routes/PhysicianController');
 const particleController = require('./routes/ParticleController');
+const apiKeyService = require("./service/ApiKeyService.js")
+
+var  API_KEY = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+API_KEY = "DUMMY"
+console.log(`Generated API Key: ${API_KEY}`); // Print the generated API Key on server startup
+process.env.API_KEY = API_KEY;
 
 // Initialize the express app
 const app = express();
@@ -36,6 +42,7 @@ app.use(function (req, res, next) {
     next();
 });
 
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(logger('dev'));
@@ -48,7 +55,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/patient', patientController);
 app.use('/physician', physicianRoutes);
-app.use('/particle', particleController);
+app.use('/particle',apiKeyService, particleController);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
