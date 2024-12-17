@@ -1,6 +1,4 @@
-# Create a .md file with the given content
 
-project_content = """
 # ECE 513 Final Project: Blood Oxygen Monitoring System
 
 This project is a web application designed to monitor blood oxygen levels, implementing an Express.js server with MongoDB for data management.
@@ -48,5 +46,3 @@ css
 Copy code
 
 This markdown includes all installation steps and other sections inside the proper markdown code blocks, making it ready to be copied into a `README.md` file.
-"""
-
