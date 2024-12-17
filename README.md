@@ -13,7 +13,7 @@ This project is a web application designed to monitor blood oxygen levels, imple
 ## Installation
 
 ### Clone the repository
-\`\`\`bash
+
 git clone https://github.com/kANNISTER/BloodOxygenMonitoring.git
 cd BloodOxygenMonitoring
 Install dependencies
@@ -23,7 +23,7 @@ npm install
 Set up MongoDB
 Ensure MongoDB is installed and running on your system. Connect to your MongoDB instance:
 
-bash
+
 Copy code
 mongodb://127.0.0.1/eceFinalProject
 Configure HTTPS
