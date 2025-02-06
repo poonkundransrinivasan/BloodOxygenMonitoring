@@ -55,7 +55,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/patient', patientController);
 app.use('/physician', physicianRoutes);
-app.use('/particle',apiKeyService, particleController);
+app.use('/particle', particleController);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

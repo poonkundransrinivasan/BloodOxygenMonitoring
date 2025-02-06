@@ -58,7 +58,7 @@ router.post('/particles', async (req, res) => {
 
 router.get('/insertdummydata', async (req, res) => {
     try {
-        const deviceSerialNumber = "556d8fqsdrfse000";
+        const deviceSerialNumber = "e00fce684e51fc80afbb3bdb";
         const baseDate = new Date();
         baseDate.setHours(0, 0, 0, 0); // Start at midnight today
 
